@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RobotOps · 机器人运维知识平台</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%232f6bff'/><circle cx='9' cy='12' r='1.6' fill='white'/><circle cx='15' cy='12' r='1.6' fill='white'/></svg>">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+            <rect x="4" y="8.5" width="16" height="11.5" rx="3.5"></rect>
+            <line x1="12" y1="4.5" x2="12" y2="8.5"></line>
+            <circle cx="12" cy="3.4" r="1.4"></circle>
+            <circle cx="9" cy="13.5" r="1.3" fill="currentColor" stroke="none"></circle>
+            <circle cx="15" cy="13.5" r="1.3" fill="currentColor" stroke="none"></circle>
+            <line x1="9" y1="17" x2="15" y2="17"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <strong>RobotOps</strong>
+          <span>运维知识平台</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="主导航">
+        <button class="nav-item active" data-view="rag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>智能问答</span>
+        </button>
+        <button class="nav-item" data-view="sql">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="8" ry="3"></ellipse>
+            <path d="M4 5v7c0 1.66 3.58 3 8 3s8-1.34 8-3V5"></path>
+            <path d="M4 12v7c0 1.66 3.58 3 8 3s8-1.34 8-3v-7"></path>
+          </svg>
+          <span>数据查询</span>
+        </button>
+        <button class="nav-item" data-view="docs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="8" y1="13" x2="16" y2="13"></line>
+            <line x1="8" y1="17" x2="13" y2="17"></line>
+          </svg>
+          <span>文档管理</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <span class="dot is-waiting" id="side-dot"></span>
+        <span id="side-status">正在连接服务…</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="page-head">
+          <h1 id="page-title">智能问答</h1>
+          <p id="page-sub">基于私有运维知识库的故障排查助手</p>
+        </div>
+        <div class="status-group" id="status-group" aria-label="依赖状态">
+          <div class="status-pill is-loading">连接中…</div>
+        </div>
+      </header>
+
+      <!-- ============================================================ 问答 -->
+      <section class="view active" id="view-rag">
+        <div class="chat-shell">
+          <div class="chat" id="chat">
+            <div class="welcome" id="welcome">
+              <div class="welcome-badge">RAG</div>
+              <h2>今天要排查什么故障？</h2>
+              <p>答案只来自内置的 5 篇运维文档，没有资料时会明确返回「暂无资料」，不会编造。</p>
+              <div class="chips" id="rag-samples">
+                <button class="chip" type="button">激光雷达无数据、导航起不来怎么排查？</button>
+                <button class="chip" type="button">机器人频繁避障绕路应该检查什么？</button>
+                <button class="chip" type="button">电池电量下降过快是什么原因？</button>
+                <button class="chip" type="button">中控平台断连怎么处理？</button>
+              </div>
+            </div>
+          </div>
+          <form class="composer" id="rag-form">
+            <textarea id="rag-input" rows="1" maxlength="500" placeholder="描述故障现象，例如：激光雷达无数据、导航起不来怎么排查？"></textarea>
+            <button class="send-btn" id="rag-send" type="submit" aria-label="发送问题">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
+          <p class="composer-hint">Enter 发送 · Shift + Enter 换行 · 相同问题会命中缓存</p>
+        </div>
+      </section>
+
+      <!-- ============================================================ 数据 -->
+      <section class="view" id="view-sql">
+        <div class="panel query-panel">
+          <div class="panel-head">
+            <div>
+              <h2>用中文查巡检数据</h2>
+              <p>自动生成只读 SELECT，写操作与危险语句会被拦截。</p>
+            </div>
+            <span class="tag">Text2SQL</span>
+          </div>
+          <form class="sql-form" id="sql-form">
+            <input id="sql-input" type="text" maxlength="300" placeholder="例如：最近24小时电量低于20%的记录" autocomplete="off">
+            <button class="btn primary" id="sql-send" type="submit">生成并执行</button>
+          </form>
+          <div class="chips" id="sql-samples">
+            <button class="chip" type="button">最近24小时电量低于20%的记录</button>
+            <button class="chip" type="button">哪个机器人故障最多</button>
+            <button class="chip" type="button">最近7天各报警类型数量</button>
+            <button class="chip" type="button">RBT-01 最近的巡检记录</button>
+          </div>
+        </div>
+        <div class="sql-result empty" id="sql-result">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="8" ry="3"></ellipse>
+              <path d="M4 5v7c0 1.66 3.58 3 8 3s8-1.34 8-3V5"></path>
+              <path d="M4 12v7c0 1.66 3.58 3 8 3s8-1.34 8-3v-7"></path>
+            </svg>
+            <p>查询结果会显示在这里</p>
+            <span>生成的 SQL、执行计划与数据表都会保留在页面上，方便核对。</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ 文档 -->
+      <section class="view" id="view-docs">
+        <div class="docs-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>上传运维文档</h2>
+                <p>支持 Markdown / TXT，单文件不超过 2 MB，入库后立即可被检索。</p>
+              </div>
+            </div>
+            <label class="dropzone" id="dropzone">
+              <input type="file" id="file-input" accept=".md,.txt" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <strong>点击选择文件，或拖拽到这里</strong>
+              <span>.md / .txt · 同名文件会自动覆盖旧切片</span>
+            </label>
+            <div class="result-note" id="upload-result"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>知识库状态</h2>
+                <p>当前向量集合与模型配置。</p>
+              </div>
+              <button class="btn ghost" id="reindex-btn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                重建知识库
+              </button>
+            </div>
+            <dl class="stat-list">
+              <div><dt>向量集合</dt><dd id="stat-collection">—</dd></div>
+              <div><dt>文档切片</dt><dd id="stat-chunks">—</dd></div>
+              <div><dt>对话模型</dt><dd id="stat-chat-model">—</dd></div>
+              <div><dt>向量模型</dt><dd id="stat-embed-model">—</dd></div>
+            </dl>
+            <div class="result-note" id="reindex-result"></div>
+            <p class="hint">切换 Embedding 模型或维度后，必须重建知识库，否则新旧向量维度不一致。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
